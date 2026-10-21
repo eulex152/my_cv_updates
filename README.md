@@ -1,7 +1,7 @@
 # CV — Euler Lorenzo Romero Chagua
 
 Personal CV website (ES / EN), published with GitHub Pages:
-**https://eulex152.github.io/my_cv_updates/**
+**https://eulex152.github.io/**
 
 Plain HTML + CSS + vanilla JS. No build step for the website itself.
 
