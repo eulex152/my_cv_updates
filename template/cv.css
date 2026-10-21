@@ -16,6 +16,8 @@ body {
 }
 /* On screen, show it like a sheet of paper for previewing. */
 @media screen { body { max-width: 210mm; margin: 12mm auto; padding: 0 17mm; } }
+.print-hint { background: #fff6d6; border: 1px solid #e8d48a; border-radius: 6px; padding: 8pt 10pt; margin-bottom: 12pt; font-size: 10.5pt; }
+@media print { .print-hint { display: none; } }
 
 a { color: var(--link); text-decoration: none; }
 p { margin: 0; }

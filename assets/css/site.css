@@ -64,6 +64,18 @@ svg { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; str
 }
 .lang-toggle button[aria-pressed="true"] { background: var(--accent); color: var(--accent-contrast); }
 
+/* Add/Remove switch on each experience/course entry (same look as the language toggle, smaller) */
+.item-toggle { display: inline-flex; flex: none; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); padding: 2px; }
+.item-toggle button {
+  font: 600 12px/1 inherit; font-family: inherit;
+  border: 0; background: transparent; color: var(--muted);
+  padding: 5px 10px; border-radius: 999px; cursor: pointer;
+}
+.item-toggle button[aria-pressed="true"][data-include="1"] { background: var(--accent); color: var(--accent-contrast); }
+.item-toggle button[aria-pressed="true"][data-include="0"] { background: var(--muted); color: var(--surface); }
+.excluded :is(.period, h3, h4, .date, p, ul, .verify) { opacity: .4; }
+.excluded h3, .excluded h4 { text-decoration: line-through; }
+
 /* Header */
 .hero {
   max-width: var(--maxw); margin: 16px auto 0;
@@ -112,6 +124,7 @@ main { max-width: var(--maxw); margin: 0 auto; }
 .entry:last-child { padding-bottom: 0; }
 .period { margin: 2px 0 0 !important; color: var(--muted); font-size: .92rem; font-style: italic; }
 .entry ul { margin: 6px 0 0; padding-left: 20px; }
+.entry-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 
 .course-group + .course-group { margin-top: 22px; }
 .course-group > h3 { font-size: 1rem; margin-bottom: 10px; }
@@ -128,6 +141,11 @@ main { max-width: var(--maxw); margin: 0 auto; }
   background: var(--accent-soft); padding: 3px 10px; border-radius: 999px;
 }
 .verify:hover { text-decoration: underline; }
+.course-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin-top: 8px; }
+.course-foot .verify { margin-top: 0; }
+
+.dl-status { margin: 10px 2px 0; font-size: .92rem; color: var(--muted); }
+.link-btn { font: inherit; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 
 .skill-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .skills { margin: 8px 0 0; padding-left: 20px; }
@@ -153,6 +171,7 @@ main { max-width: var(--maxw); margin: 0 auto; }
   :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #444; --border: #ccc; --accent: #0b5f86; --accent-soft: #fff; color-scheme: light; }
   body { padding: 0; font-size: 10.5pt; line-height: 1.4; }
   .no-print { display: none !important; }
+  .excluded { display: none !important; }
   .hero, .section { box-shadow: none; border: 0; padding: 0; margin: 0 0 10pt; border-radius: 0; }
   .hero { gap: 16pt; }
   .avatar { width: 80pt; height: 80pt; }

@@ -32,6 +32,14 @@ scripts/optimize-photo.mjs Crops/compresses source/photo.jpg for the web
 The phone number is **not** in `content.js` (that file is public on the website). It is set in
 `scripts/build-pdfs.mjs` (`PHONE`) and only appears inside the PDFs. Set it to `''` to remove it.
 
+## Custom PDF (Add / Remove)
+
+Each entry under Experience and Training has an **Agregar / Quitar** (Add / Remove) switch on the website.
+The choice is remembered in the browser (localStorage). If nothing is removed, the download buttons
+serve the pre-built PDFs. If something is removed, they open `template/cv.html` with that selection
+(`?hide=e1,c2&print=1`) and the browser's print dialog; choose "Save as PDF".
+Custom PDFs do not include the phone number (it is only added by the build script).
+
 ## Regenerating the PDFs
 
 Requires Node.js 18+.

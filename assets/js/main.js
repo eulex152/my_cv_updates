@@ -2,7 +2,11 @@
 (function () {
   const CV = window.CV;
   const STORAGE_KEY = 'cv-lang';
+  const EXCLUDED_KEY = 'cv-excluded';
   const main = document.getElementById('cv');
+  let lang = 'es';
+  // Keys of removed items: `e<index>` for experience, `c<index>` for courses (same order in es/en).
+  const excluded = new Set(readExcluded());
 
   const esc = (s) =>
     String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -18,6 +22,34 @@
 
   function saveLang(lang) {
     try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* storage unavailable */ }
+  }
+
+  function readExcluded() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(EXCLUDED_KEY) || '[]');
+      if (Array.isArray(saved)) return saved.filter((k) => /^[ec]\d+$/.test(k));
+    } catch (e) { /* storage unavailable or invalid */ }
+    return [];
+  }
+
+  function saveExcluded() {
+    try { localStorage.setItem(EXCLUDED_KEY, JSON.stringify([...excluded])); } catch (e) { /* storage unavailable */ }
+  }
+
+  // Add/Remove switch for one experience or course entry.
+  function itemToggle(key, t) {
+    const on = !excluded.has(key);
+    return `<div class="seg item-toggle no-print" role="group" aria-label="${esc(t.ui.itemToggleLabel)}" data-key="${key}">
+      <button type="button" data-include="1" aria-pressed="${on}">${esc(t.ui.add)}</button>
+      <button type="button" data-include="0" aria-pressed="${!on}">${esc(t.ui.remove)}</button>
+    </div>`;
+  }
+
+  const itemClass = (key) => (excluded.has(key) ? ' excluded' : '');
+
+  function customPdfUrl(d) {
+    const q = new URLSearchParams({ lang: d.lang, photo: d.photo ? '1' : '0', hide: [...excluded].join(','), print: '1' });
+    return `template/cv.html?${q}`;
   }
 
   const icons = {
@@ -49,23 +81,25 @@
     `<p class="period">${esc(from)}${to ? ` — ${esc(to)}` : ''}</p>`;
 
   function renderDownloads(t) {
-    const buttons = CV.downloads.map((d) => `
-      <a class="btn" href="${esc(d.file)}" download>
+    const custom = excluded.size > 0;
+    const buttons = CV.downloads.map((d, i) => `
+      <a class="btn" data-dl="${i}" href="${esc(custom ? customPdfUrl(d) : d.file)}" ${custom ? 'target="_blank" rel="noopener"' : 'download'}>
         ${icons.download}
-        <span><span class="btn-label">${esc(d.label)}</span><span class="btn-note">${esc(d.note)}</span></span>
+        <span><span class="btn-label">${esc(d.label)}</span><span class="btn-note">${esc(d.note)}${custom ? ` · ${esc(CV[d.lang].ui.customNote)}` : ''}</span></span>
       </a>`).join('');
-    return `<section class="downloads no-print" aria-labelledby="dl-h">
-      <h2 id="dl-h" class="visually-hidden">${esc(t.ui.downloads)}</h2>
-      <div class="btn-grid">${buttons}</div>
-    </section>`;
+    const status = custom
+      ? `<p class="dl-status">${esc(t.ui.removedNote.replace('{n}', excluded.size))} <button type="button" class="link-btn" data-reset>${esc(t.ui.reset)}</button></p>`
+      : '';
+    return `<h2 id="dl-h" class="visually-hidden">${esc(t.ui.downloads)}</h2>
+      <div class="btn-grid">${buttons}</div>${status}`;
   }
 
   function renderExperience(t) {
-    return t.experience.map((e) => `
-      <article class="entry">
+    return t.experience.map((e, i) => `
+      <article class="entry${itemClass(`e${i}`)}" data-key="e${i}">
         ${period(e.from, e.to)}
         <div>
-          <h3>${esc(e.role)}</h3>
+          <div class="entry-head"><h3>${esc(e.role)}</h3>${itemToggle(`e${i}`, t)}</div>
           <p class="org">${esc(e.place)}</p>
           ${e.text ? `<p>${esc(e.text)}</p>` : ''}
           ${e.bullets ? `<ul>${e.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
@@ -86,15 +120,18 @@
 
   function renderCourses(t) {
     return CV.courseGroupOrder.map((g) => {
-      const items = t.courses.filter((c) => c.group === g).map((c) => `
-        <li class="course">
+      const items = t.courses.map((c, i) => ({ c, key: `c${i}` })).filter(({ c }) => c.group === g).map(({ c, key }) => `
+        <li class="course${itemClass(key)}" data-key="${key}">
           <div class="course-head">
             <h4>${esc(c.name)}</h4>
             <span class="date">${esc(c.date)}</span>
           </div>
           <p class="org">${esc(c.org)}</p>
           <p>${esc(c.text)}</p>
-          ${c.verify ? `<a class="verify" href="${verifyUrl(c.verify)}" target="_blank" rel="noopener">${icons.check}${esc(t.ui.verify)} · ${esc(c.verify)}</a>` : ''}
+          <div class="course-foot">
+            ${c.verify ? `<a class="verify" href="${verifyUrl(c.verify)}" target="_blank" rel="noopener">${icons.check}${esc(t.ui.verify)} · ${esc(c.verify)}</a>` : '<span></span>'}
+            ${itemToggle(key, t)}
+          </div>
         </li>`).join('');
       return `<div class="course-group"><h3>${esc(t.courseGroups[g])}</h3><ul class="courses">${items}</ul></div>`;
     }).join('');
@@ -121,7 +158,12 @@
       </article>`).join('');
   }
 
-  function render(lang) {
+  function renderDownloadsInto(t) {
+    document.getElementById('downloads').innerHTML = renderDownloads(t);
+  }
+
+  function render(newLang) {
+    lang = newLang;
     const t = CV[lang];
     document.documentElement.lang = t.htmlLang;
     document.title = t.meta.title;
@@ -132,7 +174,7 @@
     renderContact(t);
 
     main.innerHTML = [
-      renderDownloads(t),
+      `<section class="downloads no-print" id="downloads" aria-labelledby="dl-h">${renderDownloads(t)}</section>`,
       section('perfil', t.sections.profile, `<p class="lead">${esc(t.profile)}</p>`),
       section('experiencia', t.sections.experience, renderExperience(t)),
       section('educacion', t.sections.education, renderEducation(t)),
@@ -151,6 +193,27 @@
       saveLang(b.dataset.lang);
       render(b.dataset.lang);
     });
+  });
+
+  // Add/Remove switches and the reset button. Updated in place so focus and scroll are kept.
+  main.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.item-toggle button, [data-reset]');
+    if (!btn) return;
+    if (btn.hasAttribute('data-reset')) {
+      excluded.clear();
+    } else {
+      const key = btn.closest('.item-toggle').dataset.key;
+      if (btn.dataset.include === '1') excluded.delete(key); else excluded.add(key);
+    }
+    saveExcluded();
+    main.querySelectorAll('[data-key].entry, [data-key].course').forEach((el) => {
+      const off = excluded.has(el.dataset.key);
+      el.classList.toggle('excluded', off);
+      el.querySelectorAll('.item-toggle button').forEach((b) => {
+        b.setAttribute('aria-pressed', String((b.dataset.include === '1') !== off));
+      });
+    });
+    renderDownloadsInto(CV[lang]);
   });
 
   render(readLang());
