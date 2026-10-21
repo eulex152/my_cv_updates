@@ -1,0 +1,13 @@
+{
+  "name": "my_cv_updates",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:pdfs": "node scripts/build-pdfs.mjs",
+    "build:photo": "node scripts/optimize-photo.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.48.2",
+    "sharp": "0.33.5"
+  }
+}

@@ -1,0 +1,48 @@
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url(../assets/fonts/source-sans-3-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: italic; font-weight: 400; src: url(../assets/fonts/source-sans-3-latin-400-italic.woff2) format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url(../assets/fonts/source-sans-3-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; src: url(../assets/fonts/source-sans-3-latin-700-normal.woff2) format('woff2'); }
+
+@page { size: A4; margin: 16mm 17mm 16mm 17mm; }
+
+:root { --text: #111; --muted: #555; --rule: #222; --link: #0b4f9c; }
+
+* { box-sizing: border-box; }
+html { background: #fff; }
+body {
+  margin: 0; color: var(--text);
+  font: 400 10.4pt/1.38 'Source Sans 3', sans-serif;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+/* On screen, show it like a sheet of paper for previewing. */
+@media screen { body { max-width: 210mm; margin: 12mm auto; padding: 0 17mm; } }
+
+a { color: var(--link); text-decoration: none; }
+p { margin: 0; }
+b { font-weight: 700; }
+
+header { text-align: center; padding-bottom: 9pt; border-bottom: 1px solid var(--rule); margin-bottom: 10pt; }
+header.has-photo { display: flex; align-items: center; gap: 16pt; text-align: left; }
+.photo { width: 82pt; height: 82pt; border-radius: 50%; object-fit: cover; flex: none; }
+.cv-label { font-style: italic; color: var(--muted); font-size: 10pt; }
+h1 { margin: 1pt 0 0; font-size: 18pt; line-height: 1.15; font-weight: 700; }
+.title { font-weight: 600; font-size: 11pt; margin-top: 2pt; }
+.contact { margin-top: 3pt; font-size: 9.8pt; }
+.contact .sep { color: var(--muted); padding: 0 6pt; }
+
+.profile { text-align: justify; }
+
+section { margin-top: 11pt; }
+h2 { font-size: 12.5pt; font-weight: 700; margin: 0 0 5pt; padding-left: 2pt; break-after: avoid; }
+h3 { font-size: 10.4pt; font-weight: 700; margin: 5pt 0 1pt; break-after: avoid; }
+
+.row { display: grid; grid-template-columns: 34mm 1fr; gap: 0 6mm; margin-bottom: 7pt; break-inside: avoid; }
+.row.compact { margin-bottom: 6pt; }
+.when { font-style: italic; color: #222; }
+.what .desc { margin-top: 3pt; text-align: justify; }
+.course-name { text-transform: uppercase; font-size: 9.8pt; letter-spacing: .01em; }
+.org { font-style: italic; }
+.verify { color: var(--muted); font-size: 8.4pt; }
+
+ul { margin: 2pt 0 0; padding-left: 14pt; }
+li { margin: 0; }
